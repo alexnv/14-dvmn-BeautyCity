@@ -2,6 +2,9 @@ from django.db import models
 
 # Create your models here.
 class BeautySaloon(models.Model):
+    """
+    Модель салона красоты
+    """
     name = models.CharField(
         'Название салона', max_length=200, db_index=True
     )
@@ -11,11 +14,17 @@ class BeautySaloon(models.Model):
 
 
 class Employee(models.Model):
+    """
+    Модель сотрудника
+    """
     name = models.CharField(
         'ФИО Работника', max_length=200, db_index=True
     )
 
 class Serivice(models.Model):
+    """
+    Модель услуги
+    """
     name = models.CharField(
         'Название услуги', max_length=200, db_index=True
     )
@@ -27,6 +36,9 @@ class Serivice(models.Model):
         return self.name
 
 class Customer(models.Model):
+    """
+    Модель покупателя
+    """
     name = models.CharField(
         'ФИО Клиента',
         max_length=200
@@ -34,6 +46,9 @@ class Customer(models.Model):
     phonenumber = models.CharField('Номер телефона клиента', max_length=20)
 
 class Schedule(models.Model):
+    """
+    Модель таблицы записи покупателя на прием к специалисту на конкретную услугу
+    """
     saloon = models.ForeignKey(
         BeautySaloon,
         on_delete=models.SET_NULL,
