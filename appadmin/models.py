@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class BeautySaloon(models.Model):
     """
@@ -12,6 +13,9 @@ class BeautySaloon(models.Model):
         'Адрес салона',
         help_text='ул. Подольских курсантов д.5 кв.4')
 
+    phonenumber = models.CharField('Номер телефона салона', max_length=20, null=True,
+                                   blank=False)
+
 
 class Employee(models.Model):
     """
@@ -21,6 +25,7 @@ class Employee(models.Model):
         'ФИО Работника', max_length=200, db_index=True
     )
 
+
 class Serivice(models.Model):
     """
     Модель услуги
@@ -28,12 +33,13 @@ class Serivice(models.Model):
     name = models.CharField(
         'Название услуги', max_length=200, db_index=True
     )
-    price= models.FloatField(
+    price = models.FloatField(
         'Стоимость услуги',
     )
 
     def __str__(self):
         return self.name
+
 
 class Customer(models.Model):
     """
@@ -44,6 +50,9 @@ class Customer(models.Model):
         max_length=200
     )
     phonenumber = models.CharField('Номер телефона клиента', max_length=20)
+    CHAT_ID = models.CharField('идентификатор чата tg с клиентом', max_length=20, null=True,
+                               blank=False)
+
 
 class Schedule(models.Model):
     """
@@ -78,37 +87,37 @@ class Schedule(models.Model):
 
     created_at = models.DateTimeField(
         'Дата время создания записи',
-        null = True,
-        blank = False
+        null=True,
+        blank=False
     )
 
     start_at = models.DateTimeField(
         'Начало сеанса',
-        null = True,
-        blank = False
+        null=True,
+        blank=False
     )
     end_at = models.DateTimeField(
         'Окончание сеанса',
-        null = True,
-        blank = False
+        null=True,
+        blank=False
     )
 
-    price= models.FloatField(
+    price = models.FloatField(
         'Стоимость услуги',
-        null = True,
-        blank = False
+        null=True,
+        blank=False
     )
 
     deliver = models.BooleanField(
         'Услуга оказана',
-        null = True,
-        blank = False,
+        null=True,
+        blank=False,
         default=False
     )
 
     tentatively = models.BooleanField(
         'Предварительная запись',
-        null = True,
-        blank = False,
+        null=True,
+        blank=False,
         default=True
     )
