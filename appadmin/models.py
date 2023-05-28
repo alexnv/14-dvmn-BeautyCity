@@ -85,6 +85,14 @@ class Schedule(models.Model):
         blank=False
     )
 
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        related_name='schedules',
+        verbose_name='Специалист',
+        null=True,
+        blank=False
+    )
     created_at = models.DateTimeField(
         'Дата время создания записи',
         null=True,
@@ -115,9 +123,27 @@ class Schedule(models.Model):
         default=False
     )
 
-    tentatively = models.BooleanField(
-        'Предварительная запись',
+
+class Feedback(models.Model):
+    text = models.TextField('Содержимое отзыва',
+                            null=True,
+                            blank=False,
+                            )
+
+    customer = models.ForeignKey(
+        Customer,
+        on_delete=models.SET_NULL,
+        related_name='feedbacks',
+        verbose_name='Покупатель',
         null=True,
-        blank=False,
-        default=True
+        blank=False
+    )
+
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.SET_NULL,
+        related_name='feedbacks',
+        verbose_name='Специалист',
+        null=True,
+        blank=False
     )
