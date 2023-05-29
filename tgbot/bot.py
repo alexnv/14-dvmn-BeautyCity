@@ -2,7 +2,7 @@ import logging
 from dotenv import load_dotenv
 
 import datetime
-from datetime import datetime
+
 
 import aiosqlite
 import qrcode
@@ -1047,7 +1047,7 @@ async def addvisit():
             monthnew = 1
 
     datenew = datetime(dt.year, monthnew, deynew, hournew)
-    dateend = datenew + datetime.timedelta(hours=1)
+    dateend = datenew + timedelta(hours=1)
 
     event_ = (None, datetime.now(), datenew, dateend, 500, False, customer_id, 1, PRROCEDURE_ID, SEL_MASTER)
     async with aiosqlite.connect(chf.file_db) as db:
