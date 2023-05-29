@@ -28,7 +28,7 @@ text_Contacts = "Руководитель: Ольга Ольговна Ольг�
                 "Tel: 8 800 555 35 35 \n " \
                 "Адрес салона: Дремучий лес, избушка на курьих ножках"
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 file_db = BASE_DIR / './db.sqlite3'
 
