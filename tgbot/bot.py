@@ -972,11 +972,6 @@ async def adress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         n = n + 1
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    text = "Выберите процедуру"
-    if len(list_ord) == 0:
-        text = 'На ближайший месяц все мастера заняты'
-        await update.message.reply_text(text=text, parse_mode="html")
-        return CHOOSING
 
     text = "Выберите необходимую процедуру"
 
