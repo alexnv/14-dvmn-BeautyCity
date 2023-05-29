@@ -27,7 +27,7 @@ text_Contacts = "Руководитель: Ольга Ольговна Ольг�
                 "Адрес салона: Дремучий лес, избушка на курьих ножках"
 
 
-file_db = './db.sqlite3'
+file_db = '../db.sqlite3'
 
 sql_create_ssf_table = """ CREATE TABLE IF NOT EXISTS projects (
                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
