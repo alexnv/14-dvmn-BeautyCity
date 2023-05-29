@@ -1036,7 +1036,7 @@ async def addvisit():
     res = await conn.execute(f'SELECT * FROM appadmin_customer WHERE CHAT_ID == {CHAT_ID}')
     list_ord = await res.fetchall()
     await close_connection(conn)
-    customer_id = list_ord[0][1]
+    customer_id = list_ord[0][0]
 
     # добавить строку
     dt = datetime.now()
