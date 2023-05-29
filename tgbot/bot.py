@@ -1048,7 +1048,7 @@ async def addvisit():
 
     datenew = datetime(dt.year, monthnew, deynew, hournew)
 
-    event_ = (None, datetime.now(), datenew, datenew + datetime.timedelta(hours=1), 500, False, customer_id, None, PRROCEDURE_ID, SEL_MASTER)
+    event_ = (None, datetime.now(), datenew, datenew + datetime.timedelta(hours=1), 500, False, customer_id, 1, PRROCEDURE_ID, SEL_MASTER)
     async with aiosqlite.connect(chf.file_db) as db:
         await db.execute('INSERT INTO appadmin_schedule VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', event_)
         await db.commit()
