@@ -1331,4 +1331,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    print(f"{chf.file_db}")
     main()
