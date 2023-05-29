@@ -44,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 OK_PD, NOT_PD, CHOOSING, TYPING_REPLY, TYPING_CHOICE, START_ROUTES, END_ROUTES, FIO, ADRESS, PROCEDURES, \
 COMMENT, END_DATE, OK_DE, NOT_DE, DELIVERY, SEL_QR, LOAD1, LOAD2, LOAD3, LOAD4, LOAD5, LOAD6, LOAD7, LOAD8, LOAD9, \
-LOAD10, RCEPTIONHOUR, MASTER = range(28)
+LOAD10, RCEPTIONHOUR, MASTER, REVIEW, OK_REW, NOT_REW, REW_TEXT, ADDREWIEV = range(33)
 
 ORD0, ORD1, ORD2, ORD3, ORD4, ORD5, ORD6, ORD7, ORD8, ORD9, ORD10 = range(11)
 ORD01, ORD11, ORD21, ORD31, ORD41, ORD51, ORD61, ORD71, ORD81, ORD91, ORD101 = range(11)
@@ -69,6 +69,8 @@ SELECTDAYPROCFUNK = 0
 SEL_MASTER = 0
 PRROCEDURE_ID = 0
 SEL_DAY = 0
+TEXT_REW = ''
+CUSTOMER = ''
 
 
 
@@ -123,15 +125,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def regular_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    global CHAT_ID, ORD1, ORD2, ORD3, ORD4, ORD5, ORD6, ORD7, ORD8, ORD9, ORD10, \
+    global CHAT_ID, ORD1, ORD2, ORD3, ORD4, ORD5, ORD6, ORD7, ORD8, ORD9, ORD10, CUSTOMER,\
         ORD11, ORD21, ORD31, ORD41, ORD51, ORD61, ORD71, ORD81, ORD91, ORD101, SDR1,\
         SDR2, SDR3, SDR4, SDR5, SDR6, SDR7, SDR8, SDR9, SDR10, SDR11, SDR12, SDR13, SDR14, \
         SDR15, SDR16, SDR17, SDR18, SDR19, SDR20, SDR21, SDR22, SDR23, SDR24, SDR25, SDR26, \
         SDR27, SDR28, SDR29, SDR30, SDR31, DAY1, DAY2, DAY3, DAY4, DAY5, DAY6, DAY7, DAY8, DAY9, \
         DAY10, DAY11, DAY12, DAY13, DAY14, DAY15, DAY16, DAY17, DAY18, DAY19, DAY20, DAY21, DAY22, \
         DAY23, DAY24, DAY25, DAY26, DAY27, DAY28, DAY29, DAY30, DAY31, TIME1, TIME2, TIME3, TIME4, TIME5, \
-        TIME6, TIME7, TIME8, HR1, HR2, HR3, HR4, HR5, HR6, HR7, HR8, MAST1, MAST2, MAST3, MAST4, MAST5
-
+        TIME6, TIME7, TIME8, HR1, HR2, HR3, HR4, HR5, HR6, HR7, HR8, MAST1, MAST2, MAST3, MAST4, MAST5, CHAT_ID
 
     """Ask the user for info about the selected predefined choice."""
     """Запросите у пользователя информацию о выбранном предопределенном выборе."""
@@ -166,12 +167,71 @@ async def regular_choice(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         query = update.callback_query
         query = update.message
-
         await query.reply_text(text=text, parse_mode="html")
 
+        CHAT_ID = query.chat.id
+        conn = await create_connection()
+        res1 = await conn.execute('SELECT * FROM appadmin_customer WHERE CHAT_ID == CHAT_ID')
+        list_ord = await res1.fetchall()
+        await close_connection(conn)
+
+        if len(list_ord) < 1:
+            text = 'Вы не являетесь зарегистрированным ппользователем поэтому не можете оставить отзыв'
+            await query.reply_text(text=text, parse_mode="html")
+            return CHOOSING
+        else:
+            CUSTOMER = list_ord[0][1]
+            keyboard = [
+                [
+                    InlineKeyboardButton("Да", callback_data=str(OK_REW)),
+                    InlineKeyboardButton("Нет", callback_data=str(NOT_REW)),
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            text = "Хотите оставить отзыв?"
+            await update.message.reply_text(text=text, parse_mode="html", reply_markup=reply_markup)
+            return REVIEW
 
 
-        return CHOOSING
+async def ok_rew(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    global CHAT_ID
+    query = update.callback_query
+    await query.answer()
+    text = "Введите текст отзыва"
+    await query.edit_message_text(text=text, parse_mode="html")
+    return REW_TEXT
+
+async def mastername(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    global TEXT_FIO, CHAT_ID, TEXT_REW
+    TEXT_REW = update.message.text
+    query = update.message
+    text = "Введите имя мастера "
+    await query.reply_text(text=text, parse_mode="html")
+    return ADDREWIEV # ADRESS
+
+
+async def addrew(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    global TEXT_FIO, CHAT_ID, TEXT_REW, CUSTOMER
+    namemaster = update.message.text
+
+    event_ = (TEXT_REW, CUSTOMER, namemaster)
+    async with aiosqlite.connect(chf.file_db) as db:
+        await db.execute('INSERT INTO appadmin_Feedback VALUES (?, ?, ?)', event_)
+        await db.commit()
+    text = "Ваш отзыв записан"
+    query = update.message
+    await query.reply_text(text=text, parse_mode="html")
+    return CHOOSING
+
+
+
+
+async def not_rew(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = "Хорошо, в следующий раз "
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(text=text, parse_mode="html")
+    return CHOOSING
 
 
 async def selectday():
@@ -1178,6 +1238,10 @@ def main() -> None:
                 CallbackQueryHandler(ok_pd, pattern="^" + str(OK_PD) + "$"),
                 CallbackQueryHandler(not_pd, pattern="^" + str(NOT_PD) + "$")
             ],
+            REVIEW: [
+                CallbackQueryHandler(ok_rew, pattern="^" + str(OK_REW) + "$"),
+                CallbackQueryHandler(not_rew, pattern="^" + str(NOT_REW) + "$")
+            ],
             MASTER: [
                 CallbackQueryHandler(m1, pattern="^" + str(MAST1) + "$"),
                 CallbackQueryHandler(m2, pattern="^" + str(MAST2) + "$"),
@@ -1190,7 +1254,9 @@ def main() -> None:
             TYPING_CHOICE: [MessageHandler(filters.TEXT & ~(filters.COMMAND | filters.Regex("^Выйти из бота$")), regular_choice)],
             TYPING_REPLY: [MessageHandler(filters.TEXT & ~(filters.COMMAND | filters.Regex("^Выйти из бота$")), received_information, )],
             FIO: [MessageHandler(filters.TEXT, fio)],
+            REW_TEXT: [MessageHandler(filters.TEXT, mastername)],
             ADRESS: [MessageHandler(filters.TEXT, adress)],
+            ADDREWIEV: [MessageHandler(filters.TEXT, addrew)],
             COMMENT: [MessageHandler(filters.TEXT, comment)],
             END_DATE: [MessageHandler(filters.TEXT, enddate)],
             RCEPTIONHOUR: [
