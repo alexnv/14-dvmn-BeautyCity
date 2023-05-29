@@ -1032,6 +1032,11 @@ async def addvisit():
                 nameproc = '1'
                 namespec = '1'
                 return nameproc, namespec
+    conn = await create_connection()
+    res = await conn.execute(f'SELECT * FROM appadmin_customer WHERE CHAT_ID == {CHAT_ID}')
+    list_ord = await res.fetchall()
+    await close_connection(conn)
+    customer_id = list_ord[0][1]
 
     # добавить строку
     dt = datetime.now()
@@ -1043,7 +1048,7 @@ async def addvisit():
 
     datenew = datetime(dt.year, monthnew, deynew, hournew)
 
-    event_ = (None, datetime.now(), datenew, None, None, 500, None, None, PRROCEDURE_ID, SEL_MASTER)
+    event_ = (None, datetime.now(), datenew, datenew + datetime.timedelta(hours=1), 500, False, customer_id, None, PRROCEDURE_ID, SEL_MASTER)
     async with aiosqlite.connect(chf.file_db) as db:
         await db.execute('INSERT INTO appadmin_schedule VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', event_)
         await db.commit()
