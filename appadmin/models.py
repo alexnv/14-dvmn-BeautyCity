@@ -128,7 +128,7 @@ class Schedule(models.Model):
         default=False
     )
     def __str__(self):
-        return f"{self.saloon} - {self.customer} | start {self.start_at} end {self.end_at}"
+        return f"{self.saloon.name} - {self.customer} | start {self.start_at} end {self.end_at}"
 
 class Feedback(models.Model):
     text = models.TextField('Содержимое отзыва',
