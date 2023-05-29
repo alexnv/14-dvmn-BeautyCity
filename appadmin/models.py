@@ -16,6 +16,8 @@ class BeautySaloon(models.Model):
     phonenumber = models.CharField('Номер телефона салона', max_length=20, null=True,
                                    blank=False)
 
+    def __str__(self):
+        return f"{self.name} / {self.address}"
 
 class Employee(models.Model):
     """
@@ -24,6 +26,8 @@ class Employee(models.Model):
     name = models.CharField(
         'ФИО Работника', max_length=200, db_index=True
     )
+    def __str__(self):
+        return f"{self.name}"
 
 
 class Serivice(models.Model):
@@ -52,7 +56,8 @@ class Customer(models.Model):
     phonenumber = models.CharField('Номер телефона клиента', max_length=20)
     CHAT_ID = models.CharField('идентификатор чата tg с клиентом', max_length=20, null=True,
                                blank=False)
-
+    def __str__(self):
+        return f"{self.name} / {self.phonenumber}"
 
 class Schedule(models.Model):
     """
@@ -122,7 +127,8 @@ class Schedule(models.Model):
         blank=False,
         default=False
     )
-
+    def __str__(self):
+        return f"{self.saloon.name} - {self.customer.name} | start {self.start_at} end {self.end_at}"
 
 class Feedback(models.Model):
     text = models.TextField('Содержимое отзыва',
